@@ -298,3 +298,164 @@ Example:
 You can create a Windows Scheduled Task that runs `mount_luks.ps1` when you log in.
 
 This allows your encrypted Linux drives to be automatically attached and mounted whenever Windows starts.
+
+# Optional: Configure Samba for Network Drive Access
+
+If you prefer to access your mounted Linux drives through standard Windows network shares, you can run Samba inside WSL.
+
+An example `smb.conf` file is included with this project.
+
+---
+
+## Install Samba
+
+Inside your WSL distribution, install Samba:
+
+```bash
+sudo apt update
+sudo apt install samba
+```
+
+---
+
+## Configure Samba
+
+Copy the included configuration file into place:
+
+```bash
+sudo cp smb.conf /etc/samba/smb.conf
+```
+
+You can edit the file later to match your own mount points and share names.
+
+Example:
+
+```ini
+[Games]
+path = /mnt/games
+
+[ArchHome]
+path = /mnt/archhome
+```
+
+---
+
+## Create a Network Bridge for WSL
+
+By default, WSL uses NAT networking, which can make Samba shares difficult to access from other devices on your network.
+
+Create a Hyper-V virtual switch in an Administrator PowerShell window:
+
+```powershell
+New-VMSwitch -Name "wsl-bridge" -NetAdapterName "Ethernet" -AllowManagementOS $true
+```
+
+Replace `"Ethernet"` with the name of your active network adapter if necessary.
+
+---
+
+## Configure WSL to Use the Bridge
+
+Edit:
+
+```text
+%USERPROFILE%\.wslconfig
+```
+
+Example configuration:
+
+```ini
+[wsl2]
+vmIdleTimeout=-1
+networkingMode=bridged
+vmSwitch=wsl-bridge
+dnsTunneling=true
+autoProxy=true
+```
+
+After saving the file, restart WSL:
+
+```powershell
+wsl --shutdown
+```
+
+Then start your WSL distribution again.
+
+---
+
+## Assign a Static IP Address (Recommended)
+
+Using bridged networking allows WSL to appear as its own device on your local network.
+
+For Samba shares, it is recommended to assign a static IP address so Windows drive mappings remain consistent after reboots.
+
+You can configure this through your router's DHCP reservation settings or by manually configuring networking inside WSL.
+
+---
+
+## Enable Samba
+
+Start Samba and configure it to start automatically when WSL launches:
+
+```bash
+sudo systemctl enable --now smbd
+```
+
+Verify that Samba is running:
+
+```bash
+sudo systemctl status smbd
+```
+
+---
+
+## Create a Samba User
+
+Create a Samba password for your Linux user account:
+
+```bash
+sudo smbpasswd -a <username>
+```
+
+Example:
+
+```bash
+sudo smbpasswd -a ozzy
+```
+
+This username and password will be used when connecting to the Samba share from Windows.
+
+---
+
+## Access the Shares from Windows
+
+Once Samba is running, open File Explorer and browse to:
+
+```text
+\\<WSL-IP-ADDRESS>\
+```
+
+Example:
+
+```text
+\\192.168.1.100\
+```
+
+You should see the shares defined in your `smb.conf` file.
+
+To map a share as a network drive:
+
+1. Open File Explorer.
+2. Right-click **This PC**.
+3. Select **Map network drive**.
+4. Enter the share path.
+5. Provide your Samba username and password when prompted.
+
+Example share paths:
+
+```text
+\\192.168.1.100\Games
+\\192.168.1.100\ArchHome
+```
+
+Your mounted LUKS volumes can now be accessed through standard Windows network drives and from other devices on your local network.
