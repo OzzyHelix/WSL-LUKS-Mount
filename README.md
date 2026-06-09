@@ -423,6 +423,19 @@ Example:
 sudo smbpasswd -a ozzy
 ```
 
+you also may need a systemd override to prevent the system from pausing the samba service
+```bash
+sudo systemctl edit smbd
+```
+This opens a blank text editor. Paste the following lines exactly between the top comment lines:
+```text
+[Service]
+OOMScoreAdjust=-1000
+Restart=always
+RestartSec=5s
+```
+Save and exit (Ctrl + O, Enter, then Ctrl + X).
+
 This username and password will be used when connecting to the Samba share from Windows.
 
 ---
