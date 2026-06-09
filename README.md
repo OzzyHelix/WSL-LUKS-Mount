@@ -1,3 +1,6 @@
+>Warning: Use at your own risk. This software is **EXPERIMENTAL** and is not advised for use in production systems. Backing up your data before use is strongly recommended.
+
+
 # WSL-LUKS-Mount
 
 Scripts and documentation for mounting LUKS-encrypted Linux drives in Windows 11 through WSL.
