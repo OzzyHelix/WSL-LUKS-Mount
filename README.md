@@ -72,6 +72,7 @@ autoProxy=true
 ### Why These Settings?
 
 Windows will often pause or shut down WSL when it becomes idle in order to save system resources.
+there are also options there that make wsl share the network with your host so in theory you can use network drive mapping to share between wsl and the host
 
 Setting:
 
