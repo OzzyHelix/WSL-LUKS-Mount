@@ -14,13 +14,13 @@ Before using this setup, your Windows installation must be located on a drive th
 
 ### Supported Configuration
 
-✅ Windows EFI/System partition on its own drive
+Windows EFI/System partition on its own drive
 
-✅ Linux LUKS-encrypted drives on separate physical drives
+Linux LUKS-encrypted drives on separate physical drives. LUKS encrypted partitions can also be shared on the same drive its just the case that Windows partitions can't
 
 ### Unsupported Configuration
 
-❌ Windows and Linux sharing the same physical drive
+Windows and Linux sharing the same physical drive
 
 WSL disk pass-through does not work reliably when Windows and Linux partitions reside on the same disk.
 
@@ -38,7 +38,7 @@ The provided PowerShell script passes physical drives directly into WSL, opens t
 
 Before continuing, ensure you have:
 
-* Windows 11
+* Windows 11 / Windows 10
 * WSL2 installed
 * An Ubuntu WSL distribution (recommended)
 * One or more LUKS-encrypted Linux drives
@@ -258,6 +258,7 @@ Open an Administrator PowerShell window and run:
 ```powershell
 .\mount_luks.ps1
 ```
+this assumes you are in the same directory as the script when running it in powershell
 
 The script will:
 
